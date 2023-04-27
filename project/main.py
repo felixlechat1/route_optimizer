@@ -29,6 +29,9 @@ def compute_tsp(dataframe, name):
             point2 = {"lat": o["lat"], "lon": o["lon"]}
             dist, duration = get_distance(point1, point2)
             dist_array.append((i, j, dist))
+        print("Computing distances for address " + str(i+1))
+    print("Graph built\n")
+    print("Starting TSP solving")
 
     # genetic algorithm parameters to solve TSP problem over all distances and addresses
     length = df.shape[0]
@@ -36,7 +39,7 @@ def compute_tsp(dataframe, name):
     problem_fit = mlrose.TSPOpt(length=length, fitness_fn=fitness_dists)
 
     # compute genetic algorithm
-    best_state, best_fitness = mlrose.genetic_alg(problem_fit, mutation_prob=0.2, max_attempts=500, random_state=2)
+    best_state, best_fitness = mlrose.genetic_alg(problem_fit, pop_size=200, mutation_prob=0.2, max_attempts=3000, random_state=2)
 
     print(f"The best state found is: {best_state}, taking {best_fitness/1000} km")
 
@@ -59,7 +62,7 @@ def load_coord(dataframe):
 
 
 if __name__ == '__main__':
-    name = 'test'
+    name = 'CDN'
     dataframe = pd.read_csv(name + ".csv")
     compute_tsp(dataframe, name)
 
