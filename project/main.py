@@ -9,6 +9,7 @@ def get_distance(point1: dict, point2: dict) -> tuple:
     """Gets distance between two points en route using http://project-osrm.org/docs/v5.10.0/api/#route-service"""
 
     url = f"""http://router.project-osrm.org/route/v1/driving/{point1["lon"]},{point1["lat"]};{point2["lon"]},{point2["lat"]}?overview=false&alternatives=false"""
+    
     r = requests.get(url)
 
     # get the distance from the returned values
@@ -53,6 +54,25 @@ def compute_tsp(dataframe, name):
     df = df.drop(columns=['Unnamed: 0', 'lat', 'lon', 'order'])
     df.to_csv(name+'_out.csv', index=False)
 
+def compute_tspV2(dataframe, name):
+    df = dataframe
+    points=""
+    for i, r in df.iterrows():
+        points+=str(r["lon"])
+        points+=','
+        points+=str(r["lat"])
+        points+=';'
+    points = points[:-1]
+    url = f"""http://router.project-osrm.org/trip/v1/driving/{points}?overview=false"""
+    print(url)
+    r = requests.get(url)
+    res = json.loads(r.content)
+    print(res['waypoints'])
+
+    order = []
+    for waypoint in res:
+        print(waypoint)
+        order.append(waypoint['waypoint_index'])
 def load_coord(dataframe):
     """Loads the coordinates to each address and inserts it in the dataframe"""
     geolocator = Nominatim(user_agent="route_optimizer")
